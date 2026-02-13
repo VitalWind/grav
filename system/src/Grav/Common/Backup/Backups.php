@@ -3,7 +3,7 @@
 /**
  * @package    Grav\Common\Backup
  *
- * @copyright  Copyright (c) 2015 - 2024 Trilby Media, LLC. All rights reserved.
+ * @copyright  Copyright (c) 2015 - 2025 Trilby Media, LLC. All rights reserved.
  * @license    MIT License; see LICENSE file for details.
  */
 
@@ -218,7 +218,7 @@ class Backups
         if ($locator->isStream($backup_root)) {
             $backup_root = $locator->findResource($backup_root);
         } else {
-            $backup_root = rtrim(GRAV_ROOT . $backup_root, '/');
+            $backup_root = rtrim(GRAV_ROOT . $backup_root, DS) ?: DS;
         }
 
         if (!$backup_root || !file_exists($backup_root)) {
@@ -315,7 +315,10 @@ class Backups
      */
     protected static function convertExclude($exclude)
     {
-        $lines = preg_split("/[\s,]+/", $exclude);
+        // Split by newlines, commas, or multiple spaces
+        $lines = preg_split("/[\r\n,]+|[\s]{2,}/", $exclude);
+        // Remove empty values and trim
+        $lines = array_filter(array_map('trim', $lines));
 
         return array_map('trim', $lines, array_fill(0, count($lines), '/'));
     }
